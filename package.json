@@ -1,0 +1,27 @@
+{
+  "name": "run-everywhere",
+  "version": "1.0.0",
+  "description": "Runs several commands in multiple folders",
+  "scripts": {
+    "test": "npm run lint && ava",
+    "lint": "eslint *.js"
+  },
+  "keywords": [
+    "electron",
+    "commands",
+    "folders"
+  ],
+  "author": {
+    "name": "Jeroen Engels",
+    "email": "jfm.engels@gmail.com",
+    "url": "github.com/jfmengels"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.16.0",
+    "eslint": "^3.7.1",
+    "eslint-config-xo": "^0.16.0",
+    "eslint-plugin-import": "^2.0.0",
+    "eslint-plugin-unicorn": "^1.0.0"
+  }
+}
