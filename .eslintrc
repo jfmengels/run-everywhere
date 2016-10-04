@@ -7,13 +7,22 @@
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 7,
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
   "extends": [
     "xo/esnext"
   ],
+  "plugins": [
+    "react"
+  ],
   "rules": {
     "comma-dangle": ["error", "always-multiline"],
-    "indent": ["error", 2]
+    "indent": ["error", 2],
+    "arrow-parens": "off",
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error"
   }
 }
