@@ -1,14 +1,15 @@
 // @flow
 import React from 'react';
+import type {CommandRun} from '../types';
 
 type Props = {
-  command: string,
+  command: CommandRun,
   onChange: Function,
 };
 
 export default (props: Props) => (
   <div>
-    <label>Command: </label>
-    <input type="input" onChange={props.onChange} value={props.command}/>
+    <label>Command ({props.command.state}): </label>
+    <input type="input" onChange={props.onChange} value={props.command.command}/>
   </div>
 );

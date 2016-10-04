@@ -1,9 +1,10 @@
 // @flow
 import React from 'react';
 import Command from './command';
+import type {CommandRun} from '../types';
 
 type Props = {
-  commands: string[],
+  commands: CommandRun[],
   onChange: (index: number, value: string) => void
 };
 
