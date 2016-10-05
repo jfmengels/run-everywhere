@@ -2,6 +2,7 @@
 // import execa from 'execa';
 import {exec} from 'child_process';
 import React from 'react';
+import {ipcRenderer as ipc} from 'electron';
 import CommandList from './components/commandList';
 import RunButton from './components/runButton';
 import type {CommandRun, CommandState} from './types';
@@ -12,6 +13,11 @@ type State = {|
 |};
 
 export default React.createClass({
+  componentDidMount() {
+    ipc.on('selected-directory', (event, path) => {
+      this.setState({...this.state, cwd: path});
+    });
+  },
   getInitialState(): State {
     return {
       cwd: process.cwd(),
@@ -37,6 +43,10 @@ export default React.createClass({
 
   onRun() {
     this.runCommand(0);
+  },
+
+  onFolderSelect() {
+    ipc.send('open-file-dialog');
   },
 
   setCommandAs(index: number, commandState: CommandState) {
@@ -68,6 +78,7 @@ export default React.createClass({
     return (
       <div>
         <RunButton onClick={this.onRun}/>
+        <button onClick={this.onFolderSelect}>Select folder</button>
         <label htmlFor="cwd"/>
         <input id="#cwd" type="input" onChange={this.onCwdChange} value={this.state.cwd}/>
         <CommandList commands={this.state.commands} onChange={this.onCommandChange}/>
