@@ -3,8 +3,8 @@
 import {exec} from 'child_process';
 import React from 'react';
 import {ipcRenderer as ipc} from 'electron';
-import CommandList from './components/commandList';
-import RunButton from './components/runButton';
+import CommandList from './components/command-list';
+import RunButton from './components/run-button';
 import type {CommandRun, CommandState} from './types';
 
 type State = {|
