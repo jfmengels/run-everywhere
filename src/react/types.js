@@ -12,3 +12,5 @@ export type CommandRun = {
   command: Command,
   state: CommandState
 };
+
+export type Folder = string;

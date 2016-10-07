@@ -3,24 +3,27 @@
 import {exec} from 'child_process';
 import React from 'react';
 import {ipcRenderer as ipc} from 'electron';
-import CommandList from './components/command-list';
 import RunButton from './components/run-button';
-import type {CommandRun, CommandState} from './types';
+import FolderInputList from './components/folder-input-list';
+import CommandList from './components/command-list';
+import type {CommandRun, CommandState, Folder} from './types';
 
 type State = {|
-  cwd: string,
+  folders: Folder[],
   commands: CommandRun[],
 |};
 
 export default React.createClass({
   componentDidMount() {
-    ipc.on('selected-directory', (event, path) => {
-      this.setState({...this.state, cwd: path});
-    });
+    ipc.on('selected-directory', this.onFolderSelect);
   },
+  
   getInitialState(): State {
     return {
-      cwd: process.cwd(),
+      folders: [
+        process.cwd(),
+        '',
+      ],
       commands: [
         {command: 'ls', state: 'pending'},
         {command: '', state: 'pending'},
@@ -37,16 +40,22 @@ export default React.createClass({
     this.setState({...this.state, commands});
   },
 
-  onCwdChange(event: any) {
-    this.setState({...this.state, cwd: event.target.value});
+  onFolderChange(index: number, value: string) {
+    const folders = [...this.state.folders];
+    folders[index] = value;
+    if (folders[folders.length - 1]) {
+      folders.push('');
+    }
+    this.setState({...this.state, folders});
   },
 
-  onRun() {
-    this.runCommand(0);
-  },
-
-  onFolderSelect() {
+  onFolderSelectRequest() {
     ipc.send('open-file-dialog');
+  },
+
+  onFolderSelect(event: any, path: string|string[]) {
+    const folder = typeof path === 'string' ? path : path[0];
+    this.onFolderChange(0, folder);
   },
 
   setCommandAs(index: number, commandState: CommandState) {
@@ -55,33 +64,44 @@ export default React.createClass({
     this.setState({...this.state, commands});
   },
 
-  runCommand(index: number) {
-    const commandItem: CommandRun = this.state.commands.filter(c => c.command)[index];
-    if (!commandItem) {
+  runCommand(folderIndex: number, commandIndex: number) {
+    const folder: Folder = this.state.folders.filter(Boolean)[folderIndex];
+    if (!folder) {
       console.log('All run!');
       return;
     }
-    this.setCommandAs(index, 'running');
-    exec(commandItem.command, {cwd: this.state.cwd}, (error, stdout, stderr) => {
+    const commandItem: CommandRun = this.state.commands.filter(c => c.command)[commandIndex];
+    if (!commandItem) {
+      return this.runCommand(folderIndex + 1, 0);
+    }
+    this.setCommandAs(commandIndex, 'running');
+    exec(commandItem.command, {cwd: folder}, (error, stdout, stderr) => {
       if (error) {
-        this.setCommandAs(index, 'failed');
+        this.setCommandAs(commandIndex, 'failed');
         console.error(stderr);
         return console.error('Aborting', error);
       }
-      this.setCommandAs(index, 'succeeded');
+      this.setCommandAs(commandIndex, 'succeeded');
       console.log(stdout);
-      this.runCommand(index + 1);
+      this.runCommand(folderIndex, commandIndex + 1);
     });
   },
 
   render() {
     return (
       <div>
-        <RunButton onClick={this.onRun}/>
-        <button onClick={this.onFolderSelect}>Select folder</button>
-        <label htmlFor="cwd"/>
-        <input id="#cwd" type="input" onChange={this.onCwdChange} value={this.state.cwd}/>
-        <CommandList commands={this.state.commands} onChange={this.onCommandChange}/>
+        <RunButton
+          onClick={() => this.runCommand(0, 0)}/>
+        <button
+          onClick={this.onFolderSelectRequest}>
+          Select folder
+        </button>
+        <FolderInputList
+          onChange={this.onFolderChange}
+          folders={this.state.folders} />
+        <CommandList
+          commands={this.state.commands}
+          onChange={this.onCommandChange}/>
       </div>
     );
   },
