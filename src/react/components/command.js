@@ -3,7 +3,7 @@ import React from 'react';
 import type {CommandRun} from '../types';
 
 type Props = {
-  command: CommandRun,
+  command: string,
   onChange: Function,
 };
 

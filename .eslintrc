@@ -16,13 +16,15 @@
     "xo/esnext"
   ],
   "plugins": [
-    "react"
+    "react",
+    "flowtype-errors"
   ],
   "rules": {
     "comma-dangle": ["error", "always-multiline"],
     "indent": ["error", 2],
     "arrow-parens": "off",
     "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error"
+    "react/jsx-uses-vars": "error",
+    "flowtype-errors/show-errors": "error"
   }
 }
